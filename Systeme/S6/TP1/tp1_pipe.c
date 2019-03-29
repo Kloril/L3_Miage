@@ -44,20 +44,25 @@ int main(int argc, char *argv[]){
          
       case 0:
       {
+         close(fdRetour[WRITE_END]);
+         close(fdAller[READ_END]);
+
+        for(int i =0;i<5;i++){
         int status;
         char msg[BUFFER_SIZE] = "Bienvenu fils 2 !";
-        sleep(1);
+        
         
         /* close the unused end of the pipe */
-        close(fdAller[READ_END]);
+       
         
         /* write to the pipe */
         write(fdAller[WRITE_END], msg, strlen(msg)+1);
+        
         printf("le fils  1 écrit : %s\n", msg);
-        fflush(stdout);
+       // fflush(stdout);
         
         /* close the write end of the pipe */
-        close(fdAller[WRITE_END]);
+        
 
       //  wait(&pid2); 
        /* Non zombie ! */
@@ -66,16 +71,18 @@ int main(int argc, char *argv[]){
         char msgRecu[BUFFER_SIZE];
         
         /* close the unused end of the pipe */
-        close(fdRetour[WRITE_END]);
+       
 
         /* read from the pipe */
         read(fdRetour[READ_END], msgRecu, BUFFER_SIZE);
         printf("Le fils 1 lit : %s\n",msgRecu);
-        fflush(stdout);
+      //  fflush(stdout);
         
         /* close the write end of the pipe */
+        
+        }
+        close(fdAller[WRITE_END]);
         close(fdRetour[READ_END]);
-    
          exit(0);
         break;
       }
@@ -94,22 +101,28 @@ int main(int argc, char *argv[]){
             
         case 0 :
         {
+            close(fdAller[WRITE_END]);
+            close(fdRetour[READ_END]);
+
+            for(int i =0;i<5;i++){
+
+            
                 char msgRecu[BUFFER_SIZE];
         
         /* close the unused end of the pipe */
-        close(fdAller[WRITE_END]);
+        
 
         /* read from the pipe */
         read(fdAller[READ_END], msgRecu, BUFFER_SIZE);
         printf("Le fils 2 lit : %s\n",msgRecu);
-        fflush(stdout);
+      //  fflush(stdout);
         
         /* close the write end of the pipe */
-        close(fdAller[READ_END]);
+       
             
                 int statusChild;
             char msg[BUFFER_SIZE] = "Bienvenu fils 1!";
-            sleep(1);
+            
             /* close the unused end of the pipe */
             close(fdRetour[READ_END]);
             
@@ -117,13 +130,14 @@ int main(int argc, char *argv[]){
             write(fdRetour[WRITE_END], msg, strlen(msg)+1);
             
             printf("le fils  2 écrit : %s\n", msg);
-            fflush(stdout);
+         //   fflush(stdout);
             
             /* close the write end of the pipe */
-            close(fdRetour[WRITE_END]);
-
+           
              /* Non zombie ! */
-    
+        }
+          close(fdRetour[WRITE_END]);
+         close(fdAller[READ_END]);
   /* child process : READ */
         exit(0);
         break;
@@ -134,7 +148,7 @@ int main(int argc, char *argv[]){
             break;
     }
      
-     
+  //close()
   return 0;
 }
 

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
   sem_unlink("/put");
   sem_unlink("/get");
   /*--- Create POSIX Named Semaphores, and initialising with 1 */
-  int init_sem_value = 1; /* Dijkstra sem */
+  int init_sem_value = 0; /* Dijkstra sem */
   sPut = sem_open("/put", O_CREAT|O_RDWR, 0644, init_sem_value);
   sGet= sem_open("/get", O_CREAT|O_RDWR, 0644, init_sem_value);
   switch (fork()){ /*----- child 1 */
@@ -57,6 +57,8 @@ int main(int argc, char *argv[]){
     printf("Error forking child 1!\n");  exit(1);
   case 0:
     {
+      
+         
       char buf[BUF_SIZE];
 
       /* Referring the semaphore */
@@ -64,21 +66,22 @@ int main(int argc, char *argv[]){
       sGet  = sem_open("/get", O_RDWR);
 
       printf("\nChild 1 executing...\n");
-
+      for(int i =0;i<50;i++){
       /*Child 1 writing in shared mem */
-      sem_wait(sGet);
+      //sem_wait(sGet);
       make_message(1,buf);
       sleep(1);
       strcpy (virtualaddr, buf);
+      printf("Message sent by child1 : %s\n", buf);
       sem_post(sGet);
 
      // Child 1 reading from shared mem 
-      sem_wait(sGet);
+      //sem_wait(sGet);
       sem_wait(sPut);   
       strcpy (buf, virtualaddr);
       printf("Message received by child 1: %s\n", buf);
-      sem_post(sPut);
-
+      //sem_post(sPut);
+        }
       /*printf("Exiting child 1...\n"); */
       _exit(0);
     }
@@ -94,6 +97,9 @@ int main(int argc, char *argv[]){
     printf("Error forking child 2!\n"); exit(1);
   case 0:
     {
+    
+    
+
       char buf[BUF_SIZE];
 
       /* Referring the semaphore */
@@ -101,23 +107,25 @@ int main(int argc, char *argv[]){
       sPut = sem_open ("/put", O_WRONLY);
 
       printf("\nChild 2 executing...\n");
-
+    for(i=0;i<50;i++){
       /*Child 2 reading from shared memory*/
-      sem_wait(sPut);    
+    //  sem_wait(sPut);    
       sem_wait(sGet);
       strcpy (buf, virtualaddr);
       printf("Message received by child 2: %s\n", buf);
   
-      sem_post(sGet);
+     // sem_post(sGet);
       
       /*Child 2 writing in shared mem*/
         
       make_message(2,buf);
       sleep(1); /* La fabrication du message prend un peu de temps*/
       strcpy(virtualaddr, buf);
+      printf("Message sent by child 2 : %s\n", buf);
       sem_post(sPut);
 
       /*printf("Exiting child 2...\n");*/
+    }
       _exit(EXIT_SUCCESS);
     }
     break;  
